@@ -1,6 +1,10 @@
-import express from 'express';
-import routes from './routes';
+const express = require('express');
+const routes = require('./routes');
+const bodyParser = require('body-parser');
+
 const app = express();
+app.use(express.json({limit: '50mb'}));
+app.use(bodyParser.json({limit: "50mb"}));
 
 let port = process.env.PORT || 3000;
 
