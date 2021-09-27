@@ -1,6 +1,5 @@
 const express = require("express");
 const elastic = require('elasticsearch');
-const {comments} = require("./comments");
 
 const router = express.Router();
 const esClient = elastic.Client({

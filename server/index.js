@@ -6,7 +6,7 @@ const app = express();
 app.use(express.json({limit: '50mb'}));
 app.use(bodyParser.json({limit: "50mb"}));
 
-let port = process.env.PORT || 3000;
+let port = process.env.PORT || 3001;
 
 app.use('/api/v1', routes);
 app.listen(port, () => {
