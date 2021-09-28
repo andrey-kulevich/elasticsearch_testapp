@@ -20,7 +20,7 @@ export default function CommentPage(): JSX.Element {
 	const dispatch = useAppDispatch();
 
 	useEffect(() => {
-		dispatch(getAllComments());
+		//dispatch(getAllComments());
 	}, []);
 
 	return <Container>aaaa</Container>;

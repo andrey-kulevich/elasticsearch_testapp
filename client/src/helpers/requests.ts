@@ -5,9 +5,16 @@ export interface IRequestParams {
 	method: Method;
 }
 
+export interface IGetCommentsQueryParams {
+	query: string;
+	from: number;
+	size: number;
+}
+
 export const requests: Record<string, IRequestParams> = {
 	getComments: {
-		url: 'comments',
+		url: (params: IGetCommentsQueryParams): string =>
+			`comments?q=${params.query}&size=${params.size}&from=${params.from}`,
 		method: 'GET',
 	},
 	getCommentById: {

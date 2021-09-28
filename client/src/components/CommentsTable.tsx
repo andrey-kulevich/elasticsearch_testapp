@@ -1,20 +1,19 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import TableContainer from '@material-ui/core/TableContainer';
-import Paper from '@material-ui/core/Paper';
 import { useSelector } from 'react-redux';
-import { RootState } from '../store/store';
+import { RootState, useAppDispatch } from '../store/store';
 import { Typography } from '@material-ui/core';
 import ProgressSpinner from './ProgressSpinner';
 import useSnackBar from '../hooks/useSnackbar';
 import { BaseTable, ITableProps } from '../containers/BaseTable';
+import { getAllComments } from '../store/comments';
 
 const useStyles = makeStyles({
 	table: {
 		minWidth: 650,
 	},
 	container: {
-		maxHeight: 550,
+		maxHeight: '70vh',
 	},
 	noPosts: {
 		margin: '1em',
@@ -27,69 +26,112 @@ const useStyles = makeStyles({
 export const CommentsTable = (): JSX.Element => {
 	const classes = useStyles();
 	const { snack, openSnack } = useSnackBar();
+	const dispatch = useAppDispatch();
 	const { comments } = useSelector((state: RootState) => state);
+
+	const [rowsPerPage, setRowsPerPage] = useState<number>(10);
+	const [page, setPage] = useState<number>(0);
+
+	const handleChangePage = (event: unknown, newPage: number) => {
+		setPage(newPage);
+		dispatch(
+			getAllComments({
+				query: '*:*',
+				from: newPage * rowsPerPage,
+				size: rowsPerPage,
+			}),
+		);
+	};
+
+	const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
+		const rows = parseInt(event.target.value, 10);
+		setRowsPerPage(rows);
+		setPage(0);
+		dispatch(
+			getAllComments({
+				query: '*:*',
+				from: 0,
+				size: rows,
+			}),
+		);
+	};
+
+	useEffect(() => {
+		dispatch(
+			getAllComments({
+				query: '*:*',
+				from: 0,
+				size: 10,
+			}),
+		);
+	}, []);
 
 	useEffect(() => {
 		if (comments.status == '404') openSnack('error', `Unable to load posts (${comments.status})`);
-		console.log(comments);
 	}, [comments.status]);
 
-	const getTableProps = (): ITableProps => {
-		return {
-			tableComponent: { stickyHeader: true, className: classes.table, size: 'small' },
-			headCells: [
-				{
-					props: {
-						className: classes.headerCell,
-					},
-					value: 'Document ID',
+	const getTableProps: ITableProps = {
+		tableComponent: { stickyHeader: true, className: classes.table, size: 'small' },
+		tableContainer: { className: classes.container },
+		headCells: [
+			{
+				props: {
+					className: classes.headerCell,
 				},
-				{
-					props: {
-						className: classes.headerCell,
-					},
-					value: 'Comment ID',
+				value: 'Document ID',
+			},
+			{
+				props: {
+					className: classes.headerCell,
 				},
-				{
-					props: {
-						className: classes.headerCell,
-					},
-					value: 'Post ID',
+				value: 'Comment ID',
+			},
+			{
+				props: {
+					className: classes.headerCell,
 				},
-				{ props: undefined, value: 'Comment Title' },
-			],
-			bodyRows: comments.comments.product.hits.hits.map((comment) => {
-				return {
-					cells: [
-						{
-							props: { component: 'th', scope: 'row' },
-							value: comment._id,
-						},
-						{
-							props: { component: 'th', scope: 'row' },
-							value: comment._source.id,
-						},
-						{
-							props: { component: 'th', scope: 'row' },
-							value: comment._source.postId,
-						},
-						{
-							props: { component: 'th', scope: 'row' },
-							value: comment._source.name,
-						},
-					],
-				};
-			}),
-		};
+				value: 'Post ID',
+			},
+			{ props: undefined, value: 'Comment Title' },
+		],
+		totalRows: comments.comments.product ? comments.comments.product.hits.total.value : 0,
+		bodyRows: comments.comments.product
+			? comments.comments.product.hits.hits.map((comment) => {
+					return {
+						cells: [
+							{
+								props: { component: 'th', scope: 'row' },
+								value: comment._id,
+							},
+							{
+								props: { component: 'th', scope: 'row' },
+								value: comment._source.id,
+							},
+							{
+								props: { component: 'th', scope: 'row' },
+								value: comment._source.postId,
+							},
+							{
+								props: { component: 'th', scope: 'row' },
+								value: comment._source.name,
+							},
+						],
+					};
+			  })
+			: [],
+		changePage: handleChangePage,
+		changeRowsPerPage: handleChangeRowsPerPage,
+		page: page,
+		rowsPerPage: rowsPerPage,
 	};
 
 	return comments.status == 'loading' ? (
 		<ProgressSpinner />
 	) : (
-		<TableContainer component={Paper} variant='outlined' className={classes.container}>
+		<>
 			{comments.comments.product ? (
 				comments.comments.product.hits.hits.length > 0 ? (
-					<BaseTable {...getTableProps()} />
+					<BaseTable {...getTableProps} />
 				) : (
 					<Typography className={classes.noPosts}>No comments, uups!</Typography>
 				)
@@ -97,6 +139,6 @@ export const CommentsTable = (): JSX.Element => {
 				<Typography className={classes.noPosts}>Unable to load comments, try again later</Typography>
 			)}
 			{snack}
-		</TableContainer>
+		</>
 	);
 };

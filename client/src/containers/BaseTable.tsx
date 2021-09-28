@@ -4,6 +4,8 @@ import TableBody from '@material-ui/core/TableBody';
 import TableCell, { TableCellProps } from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
+import { TableContainer, TablePagination } from '@material-ui/core';
+import CustomPaper from './CustomPaper';
 
 export interface ITableProps {
 	tableComponent?: {
@@ -11,37 +13,58 @@ export interface ITableProps {
 		className?: string;
 		size?: Size;
 	};
+	tableContainer?: {
+		className?: string;
+	};
 	headCells: { props?: TableCellProps; value?: any }[];
+	totalRows: number;
 	bodyRows: { cells: { props: TableCellProps; value: any }[] }[];
+	page: number;
+	rowsPerPage: number;
+	changePage: (event: unknown, newPage: number) => void;
+	changeRowsPerPage: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
-export const BaseTable = (props: ITableProps) => {
+export const BaseTable = (props: ITableProps): JSX.Element => {
 	return (
-		<Table
-			stickyHeader={props.tableComponent && props.tableComponent.stickyHeader}
-			className={props.tableComponent && props.tableComponent.className}
-			size={props.tableComponent && props.tableComponent.size}
-		>
-			<TableHead>
-				<TableRow>
-					{props.headCells.map((elem, index) => (
-						<TableCell {...elem.props} key={index}>
-							{elem.value}
-						</TableCell>
-					))}
-				</TableRow>
-			</TableHead>
-			<TableBody>
-				{props.bodyRows.map((row, index) => (
-					<TableRow key={index}>
-						{row.cells.map((cell, index) => (
-							<TableCell {...cell.props} key={index}>
-								{cell.value}
-							</TableCell>
+		<CustomPaper>
+			<TableContainer className={props.tableContainer?.className}>
+				<Table
+					stickyHeader={props.tableComponent && props.tableComponent.stickyHeader}
+					className={props.tableComponent && props.tableComponent.className}
+					size={props.tableComponent && props.tableComponent.size}
+				>
+					<TableHead>
+						<TableRow>
+							{props.headCells.map((elem, index) => (
+								<TableCell {...elem.props} key={index}>
+									{elem.value}
+								</TableCell>
+							))}
+						</TableRow>
+					</TableHead>
+					<TableBody>
+						{props.bodyRows.map((row, index) => (
+							<TableRow key={index} hover style={{ cursor: 'pointer' }}>
+								{row.cells.map((cell, index) => (
+									<TableCell {...cell.props} key={index}>
+										{cell.value}
+									</TableCell>
+								))}
+							</TableRow>
 						))}
-					</TableRow>
-				))}
-			</TableBody>
-		</Table>
+					</TableBody>
+				</Table>
+			</TableContainer>
+			<TablePagination
+				rowsPerPageOptions={[10, 25, 35]}
+				component='div'
+				count={props.totalRows}
+				rowsPerPage={props.rowsPerPage}
+				page={props.page}
+				onPageChange={props.changePage}
+				onRowsPerPageChange={props.changeRowsPerPage}
+			/>
+		</CustomPaper>
 	);
 };

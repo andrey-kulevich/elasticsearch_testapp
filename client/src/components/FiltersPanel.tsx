@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../store/store';
-import { Grid, MenuItem, Paper, TextField, Typography, Button } from '@material-ui/core';
+import { Grid, TextField, Typography, Button } from '@material-ui/core';
+import CustomPaper from '../containers/CustomPaper';
 
 const useStyles = makeStyles({
 	root: {
@@ -18,7 +19,7 @@ const useStyles = makeStyles({
 	},
 });
 
-export const FiltersPanel = () => {
+export const FiltersPanel = (): JSX.Element => {
 	const classes = useStyles();
 	//const { users } = useSelector((state: RootState) => state);
 	const dispatch = useDispatch();
@@ -31,7 +32,7 @@ export const FiltersPanel = () => {
 	};
 
 	return (
-		<Paper variant='outlined' className={classes.root}>
+		<CustomPaper className={classes.root}>
 			<Grid container direction='row' className={classes.grid}>
 				<Grid container item xs={2} alignItems='center'>
 					<Typography variant='h6'>Filter by</Typography>
@@ -77,6 +78,6 @@ export const FiltersPanel = () => {
 					</Button>
 				</Grid>
 			</Grid>
-		</Paper>
+		</CustomPaper>
 	);
 };
