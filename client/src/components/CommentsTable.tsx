@@ -60,14 +60,15 @@ export const CommentsTable = (): JSX.Element => {
 		dispatch(
 			getAllComments({
 				query: '*:*',
-				from: 0,
-				size: 10,
+				from: page,
+				size: rowsPerPage,
 			}),
 		);
 	}, []);
 
 	useEffect(() => {
 		if (comments.status == '404') openSnack('error', `Unable to load posts (${comments.status})`);
+		setPage(0);
 	}, [comments.status]);
 
 	const getTableProps: ITableProps = {
