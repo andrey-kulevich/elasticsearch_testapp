@@ -26,6 +26,7 @@ router.post('/comments', (req, res) => {
             index: 'comments',
             body: elem,
         })
+            .then(() => console.log('added'))
             .catch(err => {
                 console.log(err);
                 return res.status(500).json({
@@ -33,7 +34,6 @@ router.post('/comments', (req, res) => {
                     err
                 })
             })
-        console.log('hello')
     })
     return res.status(200).json({
         msg: 'comments are added'
@@ -65,8 +65,14 @@ router.get('/comments/:id', (req, res) => {
 
 // get all comments
 router.get('/comments', (req, res) => {
-    let query = { index: 'comments' }
-    if (req.query.comments) query.q = `*${req.query.comments}*`
+    let query = {
+        index: 'comments',
+        size: 10,
+        sort: "id"
+    }
+    if (req.query.q) query.q = req.query.q
+    if (req.query.size) query.size = req.query.size
+    if (req.query.from) query.from = req.query.from
     esClient.search(query)
         .then(resp => {
             if (!resp) return res.status(404).json({
