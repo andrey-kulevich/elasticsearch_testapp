@@ -23,6 +23,11 @@ export interface ITableProps {
 	rowsPerPage: number;
 	changePage: (event: unknown, newPage: number) => void;
 	changeRowsPerPage: (event: React.ChangeEvent<HTMLInputElement>) => void;
+	tableRow: {
+		onClick: (row: any) => void;
+		className?: string;
+		hover?: boolean;
+	};
 }
 
 export const BaseTable = (props: ITableProps): JSX.Element => {
@@ -45,7 +50,12 @@ export const BaseTable = (props: ITableProps): JSX.Element => {
 					</TableHead>
 					<TableBody>
 						{props.bodyRows.map((row, index) => (
-							<TableRow key={index} hover style={{ cursor: 'pointer' }}>
+							<TableRow
+								key={index}
+								hover={props.tableRow?.hover}
+								className={props.tableRow?.className}
+								onClick={() => props.tableRow.onClick(row)}
+							>
 								{row.cells.map((cell, index) => (
 									<TableCell {...cell.props} key={index}>
 										{cell.value}

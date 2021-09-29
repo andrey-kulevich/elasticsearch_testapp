@@ -31,10 +31,10 @@ export default function App(): JSX.Element {
 					<Route exact path={routes.toRoot}>
 						<Redirect to={routes.toCommentsPage} />
 					</Route>
-					<Route path={routes.toCommentsPage}>
+					<Route exact path={routes.toCommentsPage}>
 						<CommentsPage />
 					</Route>
-					<Route path={routes.toCommentPage}>
+					<Route exact path={routes.toCommentPage}>
 						<CommentPage />
 					</Route>
 				</Switch>

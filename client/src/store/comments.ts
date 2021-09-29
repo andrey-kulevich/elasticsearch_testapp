@@ -2,13 +2,13 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { httpHelper } from '../helpers/httpHelper';
 import { IGetCommentsQueryParams, requests } from '../helpers/requests';
 import { IComment } from '../interfaces/IComment';
-import { IElasticSearchResponse } from '../interfaces/IElasticResponse';
+import { IElasticGetResponse, IElasticSearchResponse } from '../interfaces/IElasticResponse';
 import store from './store';
 
 interface ICommentsState {
 	comments: IElasticSearchResponse;
 	queryParams: IGetCommentsQueryParams;
-	currentComment: IComment;
+	currentComment: IElasticGetResponse;
 	status: string;
 }
 
@@ -33,7 +33,7 @@ export const getAllComments = createAsyncThunk<{ comments: IElasticSearchRespons
 	},
 );
 
-export const getCommentByDocumentId = createAsyncThunk<{ currentComment: IComment; status: string }, string>(
+export const getCommentByDocumentId = createAsyncThunk<{ currentComment: IElasticGetResponse; status: string }, string>(
 	'comments/getByDocumentId',
 	async (documentId, { rejectWithValue }) => {
 		try {
@@ -42,12 +42,12 @@ export const getCommentByDocumentId = createAsyncThunk<{ currentComment: ICommen
 				requests.getCommentByDocumentId.method,
 			);
 			return {
-				currentComment: res.data,
+				currentComment: res.data.product,
 				status: res.status as unknown as string,
 			};
 		} catch (err: any) {
 			return rejectWithValue({
-				currentComment: {} as IComment,
+				currentComment: {} as IElasticGetResponse,
 				status: err.response.status as string,
 			});
 		}
@@ -61,7 +61,7 @@ const initState: ICommentsState = {
 		from: 0,
 		size: 10,
 	},
-	currentComment: {} as IComment,
+	currentComment: {} as IElasticGetResponse,
 	status: '200',
 };
 
@@ -89,7 +89,7 @@ export const commentsSlice = createSlice({
 		});
 		builder.addCase(getCommentByDocumentId.rejected, (state) => {
 			state.status = '404';
-			state.currentComment = {} as IComment;
+			state.currentComment = {} as IElasticGetResponse;
 		});
 	},
 	reducers: {

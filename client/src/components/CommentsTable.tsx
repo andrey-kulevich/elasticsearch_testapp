@@ -7,6 +7,8 @@ import ProgressSpinner from './ProgressSpinner';
 import useSnackBar from '../hooks/useSnackbar';
 import { BaseTable, ITableProps } from '../containers/BaseTable';
 import { getAllComments, setParams } from '../store/comments';
+import { useHistory } from 'react-router-dom';
+import { routes } from '../helpers/routes';
 
 const useStyles = makeStyles({
 	table: {
@@ -21,10 +23,14 @@ const useStyles = makeStyles({
 	headerCell: {
 		cursor: 'pointer',
 	},
+	tableRow: {
+		cursor: 'pointer',
+	},
 });
 
 export const CommentsTable = (): JSX.Element => {
 	const classes = useStyles();
+	const history = useHistory();
 	const { snack, openSnack } = useSnackBar();
 	const dispatch = useAppDispatch();
 	const { comments } = useSelector((state: RootState) => state);
@@ -112,6 +118,13 @@ export const CommentsTable = (): JSX.Element => {
 		changeRowsPerPage: handleChangeRowsPerPage,
 		page: comments.queryParams.from / comments.queryParams.size,
 		rowsPerPage: comments.queryParams.size,
+		tableRow: {
+			className: classes.tableRow,
+			onClick: (row) => {
+				history.push(routes.goToCommentPage(row.cells[0].value));
+			},
+			hover: true,
+		},
 	};
 
 	return comments.status == 'loading' ? (

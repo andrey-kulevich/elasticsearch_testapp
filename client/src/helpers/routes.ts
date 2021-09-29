@@ -1,3 +1,7 @@
+export interface IUseParamsTypes {
+	commentId: string;
+}
+
 export const routes = {
 	toRoot: '/',
 	toCommentsPage: '/comments',
