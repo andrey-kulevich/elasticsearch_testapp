@@ -5,9 +5,7 @@ import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import { useHistory } from 'react-router-dom';
 import { routes } from '../helpers/routes';
-import { RootState, useAppDispatch } from '../store/store';
 import { Container } from '@material-ui/core';
-import { useSelector } from 'react-redux';
 
 const useStyles = makeStyles((theme: Theme) =>
 	createStyles({
@@ -53,9 +51,6 @@ export default function Header(): JSX.Element {
 						>
 							Super comments
 						</Typography>
-						{/*<Typography className={classes.user}>*/}
-						{/*	{user.user ? `${user.user.name} ${user.user.patronymic}` : ''}*/}
-						{/*</Typography>*/}
 					</Toolbar>
 				</Container>
 			</AppBar>
