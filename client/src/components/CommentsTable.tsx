@@ -1,10 +1,9 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import { useSelector } from 'react-redux';
 import { RootState, useAppDispatch } from '../store/store';
 import { Typography } from '@material-ui/core';
 import ProgressSpinner from './ProgressSpinner';
-import useSnackBar from '../hooks/useSnackbar';
 import { BaseTable, ITableProps } from '../containers/BaseTable';
 import { getAllComments, setParams } from '../store/comments';
 import { useHistory } from 'react-router-dom';
@@ -15,7 +14,7 @@ const useStyles = makeStyles({
 		minWidth: 650,
 	},
 	container: {
-		maxHeight: '70vh',
+		maxHeight: '60vh',
 	},
 	noPosts: {
 		margin: '1em',
@@ -31,7 +30,6 @@ const useStyles = makeStyles({
 export const CommentsTable = (): JSX.Element => {
 	const classes = useStyles();
 	const history = useHistory();
-	const { snack, openSnack } = useSnackBar();
 	const dispatch = useAppDispatch();
 	const { comments } = useSelector((state: RootState) => state);
 
@@ -56,14 +54,6 @@ export const CommentsTable = (): JSX.Element => {
 		);
 		dispatch(getAllComments());
 	};
-
-	useEffect(() => {
-		dispatch(getAllComments());
-	}, []);
-
-	useEffect(() => {
-		if (comments.status == '404') openSnack('error', `Unable to load posts (${comments.status})`);
-	}, [comments.status]);
 
 	const getTableProps: ITableProps = {
 		tableComponent: { stickyHeader: true, className: classes.table, size: 'small' },
@@ -129,18 +119,13 @@ export const CommentsTable = (): JSX.Element => {
 
 	return comments.status == 'loading' ? (
 		<ProgressSpinner />
+	) : comments.comments.product ? (
+		comments.comments.product.hits.hits.length > 0 ? (
+			<BaseTable {...getTableProps} />
+		) : (
+			<Typography className={classes.noPosts}>No comments, uups!</Typography>
+		)
 	) : (
-		<>
-			{comments.comments.product ? (
-				comments.comments.product.hits.hits.length > 0 ? (
-					<BaseTable {...getTableProps} />
-				) : (
-					<Typography className={classes.noPosts}>No comments, uups!</Typography>
-				)
-			) : (
-				<Typography className={classes.noPosts}>Unable to load comments, try again later</Typography>
-			)}
-			{snack}
-		</>
+		<Typography className={classes.noPosts}>Unable to load comments, try again later</Typography>
 	);
 };
