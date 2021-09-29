@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import { useSelector } from 'react-redux';
 import { RootState, useAppDispatch } from '../store/store';
@@ -6,7 +6,7 @@ import { Typography } from '@material-ui/core';
 import ProgressSpinner from './ProgressSpinner';
 import useSnackBar from '../hooks/useSnackbar';
 import { BaseTable, ITableProps } from '../containers/BaseTable';
-import { getAllComments } from '../store/comments';
+import { getAllComments, setParams } from '../store/comments';
 
 const useStyles = makeStyles({
 	table: {
@@ -29,46 +29,34 @@ export const CommentsTable = (): JSX.Element => {
 	const dispatch = useAppDispatch();
 	const { comments } = useSelector((state: RootState) => state);
 
-	const [rowsPerPage, setRowsPerPage] = useState<number>(10);
-	const [page, setPage] = useState<number>(0);
-
 	const handleChangePage = (event: unknown, newPage: number) => {
-		setPage(newPage);
 		dispatch(
-			getAllComments({
-				query: '*:*',
-				from: newPage * rowsPerPage,
-				size: rowsPerPage,
+			setParams({
+				query: comments.queryParams.query,
+				from: newPage * comments.queryParams.size,
+				size: comments.queryParams.size,
 			}),
 		);
+		dispatch(getAllComments());
 	};
 
 	const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
-		const rows = parseInt(event.target.value, 10);
-		setRowsPerPage(rows);
-		setPage(0);
 		dispatch(
-			getAllComments({
-				query: '*:*',
+			setParams({
+				query: comments.queryParams.query,
 				from: 0,
-				size: rows,
+				size: parseInt(event.target.value, 10),
 			}),
 		);
+		dispatch(getAllComments());
 	};
 
 	useEffect(() => {
-		dispatch(
-			getAllComments({
-				query: '*:*',
-				from: page,
-				size: rowsPerPage,
-			}),
-		);
+		dispatch(getAllComments());
 	}, []);
 
 	useEffect(() => {
 		if (comments.status == '404') openSnack('error', `Unable to load posts (${comments.status})`);
-		setPage(0);
 	}, [comments.status]);
 
 	const getTableProps: ITableProps = {
@@ -122,8 +110,8 @@ export const CommentsTable = (): JSX.Element => {
 			: [],
 		changePage: handleChangePage,
 		changeRowsPerPage: handleChangeRowsPerPage,
-		page: page,
-		rowsPerPage: rowsPerPage,
+		page: comments.queryParams.from / comments.queryParams.size,
+		rowsPerPage: comments.queryParams.size,
 	};
 
 	return comments.status == 'loading' ? (

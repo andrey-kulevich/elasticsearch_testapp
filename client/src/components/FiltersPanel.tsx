@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import { useAppDispatch } from '../store/store';
+import { RootState, useAppDispatch } from '../store/store';
 import { Grid, TextField, Typography, Button } from '@material-ui/core';
 import CustomPaper from '../containers/CustomPaper';
-import { getAllComments } from '../store/comments';
+import { getAllComments, setParams } from '../store/comments';
+import { useSelector } from 'react-redux';
 
 const useStyles = makeStyles({
 	root: {
@@ -22,16 +23,18 @@ const useStyles = makeStyles({
 export const FiltersPanel = (): JSX.Element => {
 	const classes = useStyles();
 	const dispatch = useAppDispatch();
+	const { comments } = useSelector((state: RootState) => state);
 	const [title, setTitle] = useState<string>('');
 
 	const handleFilter = () => {
 		dispatch(
-			getAllComments({
+			setParams({
 				query: 'name:' + title,
-				from: 0,
-				size: 10,
+				from: comments.queryParams.from,
+				size: comments.queryParams.size,
 			}),
 		);
+		dispatch(getAllComments());
 	};
 
 	return (

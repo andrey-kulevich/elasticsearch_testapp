@@ -17,8 +17,8 @@ export const requests: Record<string, IRequestParams> = {
 			`comments?q=${params.query}&size=${params.size}&from=${params.from}`,
 		method: 'GET',
 	},
-	getCommentById: {
-		url: (commentId: number): string => `comments/${commentId}`,
+	getCommentByDocumentId: {
+		url: (documentId: number): string => `comments/${documentId}`,
 		method: 'GET',
 	},
 };
